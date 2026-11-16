@@ -1,54 +1,54 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { Menu, X } from "lucide-react"
-import Logo from "@/app/images/logo (1).png"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useSession, signOut } from "@/lib/auth-client"
+import * as React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
-// Matches the "Hireloop 2.0" design: eyebrow links + auth actions inside a
-// floating dark pill on the right of the logo.
-const NAV_LINKS = [
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/company" },
-  { label: "Pricing", href: "/pricing" },
-] as const
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/shared/user-avatar";
+import { useSession, signOut } from "@/lib/auth-client";
 
 export function SiteNavbar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const { data: session } = useSession();
 
-  console.log('user session in navbar', session)
+  const NAV_LINKS = [
+    { label: "Browse Jobs", href: "/browse-jobs" },
+    { label: "Company", href: "/company" },
+    { label: "Pricing", href: "/pricing" },
+    {
+      label: "Dashboard",
+      href: `/dashboard/${session?.user.role || "seeker"}`,
+    },
+  ] as const;
 
   React.useEffect(() => {
-    if (!open) return
+    if (!open) return;
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setOpen(false)
+        setOpen(false);
       }
     }
 
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [open])
-
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   const handleSignOut = async () => {
-    await signOut()
-  }
+    await signOut();
+  };
 
   return (
     <header className="sticky top-4 z-50 px-4 sm:px-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
         <Link href="/" aria-label="HireLoop home" className="block shrink-0">
           <Image
-            src={Logo}
+            src="/logo.png"
             alt="HireLoop"
             width={160}
             height={44}
@@ -65,7 +65,7 @@ export function SiteNavbar() {
           <ul className="flex items-center gap-5">
             {NAV_LINKS.map((link) => {
               const active =
-                pathname === link.href || pathname.startsWith(link.href + "/")
+                pathname === link.href || pathname.startsWith(link.href + "/");
 
               return (
                 <li key={link.href}>
@@ -76,13 +76,13 @@ export function SiteNavbar() {
                       "text-base tracking-[-0.0125rem] transition-colors hover:text-white",
                       active
                         ? "font-bold text-[#EDEDEF] underline underline-offset-3"
-                        : "text-[#EDEDEF]/90"
+                        : "text-[#EDEDEF]/90",
                     )}
                   >
                     {link.label}
                   </Link>
                 </li>
-              )
+              );
             })}
           </ul>
 
@@ -90,18 +90,26 @@ export function SiteNavbar() {
           <div aria-hidden className="h-px w-6 bg-[#A8A8A8]/40" />
 
           <div className="flex items-center gap-4">
-            {session?.user ?
+            {session?.user ? (
               <>
-                <span className="text-[#EDEDEF]">Welcome, {session.user.name}!</span>
+                <UserAvatar
+                  src={session.user.image}
+                  name={session.user.name}
+                  className="size-9"
+                />
+                <span className="text-[#EDEDEF]">
+                  Welcome, {session.user.name}!
+                </span>
                 <Button
                   onClick={handleSignOut}
-                  nativeButton={false}
+                  // nativeButton={false}
                   className="h-9.5 rounded-[8px] bg-transparent px-4 text-lg font-semibold text-[#645AFF] hover:bg-white/5 hover:text-[#645AFF]"
                 >
                   Sign Out
                 </Button>
               </>
-              : <>
+            ) : (
+              <>
                 <Button
                   render={<Link href="/sign-in" />}
                   nativeButton={false}
@@ -116,7 +124,8 @@ export function SiteNavbar() {
                 >
                   Get Started
                 </Button>
-              </>}
+              </>
+            )}
           </div>
         </nav>
 
@@ -129,7 +138,7 @@ export function SiteNavbar() {
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((value) => !value)}
           className={cn(
-            "size-11 rounded-lg border border-white/10 bg-[#1A1A1F] text-[#EDEDEF] hover:bg-white/5 hover:text-white lg:hidden"
+            "size-11 rounded-lg border border-white/10 bg-[#1A1A1F] text-[#EDEDEF] hover:bg-white/5 hover:text-white lg:hidden",
           )}
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -145,7 +154,7 @@ export function SiteNavbar() {
           <ul className="flex flex-col">
             {NAV_LINKS.map((link) => {
               const active =
-                pathname === link.href || pathname.startsWith(link.href + "/")
+                pathname === link.href || pathname.startsWith(link.href + "/");
 
               return (
                 <li key={link.href}>
@@ -157,13 +166,13 @@ export function SiteNavbar() {
                       "block rounded-md px-3 py-2 text-base tracking-[-0.0125rem] transition-colors hover:bg-white/5 hover:text-white",
                       active
                         ? "font-bold text-[#EDEDEF] underline underline-offset-3"
-                        : "text-[#EDEDEF]/90"
+                        : "text-[#EDEDEF]/90",
                     )}
                   >
                     {link.label}
                   </Link>
                 </li>
-              )
+              );
             })}
           </ul>
 
@@ -188,5 +197,5 @@ export function SiteNavbar() {
         </div>
       ) : null}
     </header>
-  )
+  );
 }
